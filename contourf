@@ -17,3 +17,5 @@ h.XTickLabelRotation = 0;
 h.FontSize=16; 
 box on; grid on;
 title('20200101 IASI 0.5\circ \times 0.5\circ regrided','FontSize',16, 'FontWeight', 'bold');
+
+saveas(gcf, '/home/cykim/figures/regrid_test.png');
