@@ -1,0 +1,37 @@
+avogadro_number = 6.0221e23;
+du_factor = 2.69e16;
+
+file_path = ('/data01/satellite/TROPOMI/O3/TCO/');
+mat_file_path = ('/data01/satellite/TROPOMI/O3/TCO/mat/');
+
+start_date = datenum('20200101', 'yyyymmdd');
+end_date = datenum('20201231', 'yyyymmdd');
+date_range = start_date:end_date;
+
+for t = 1:numel(date_range)
+    tic
+    current_date_str = datestr(date_range(t), 'yyyymmdd');
+    file_pattern = [file_path 'S5P_RPRO_L2__O3_____' current_date_str '*'];
+    tropomi_files = dir(file_pattern);
+    
+    tco = [];
+    lat = [];
+    lon = [];
+    
+    for file_idx = 1:numel(tropomi_files)
+        file_tco = fullfile(file_path, tropomi_files(file_idx).name);
+        tco_1 = squeeze(nc_varget(file_tco, '/PRODUCT/ozone_total_vertical_column')) * avogadro_number / (1e4 * du_factor);
+        lat_1 = squeeze(nc_varget(file_tco, '/PRODUCT/latitude'));
+        lon_1 = squeeze(nc_varget(file_tco, '/PRODUCT/longitude'));
+        
+        tco = cat(1, tco, tco_1(:));
+        lat = cat(1, lat, lat_1(:));
+        lon = cat(1, lon, lon_1(:));
+    end
+    
+    save(fullfile(mat_file_path, ['TROPOMI_TCO_' current_date_str '.mat']), 'tco');
+    save(fullfile(mat_file_path, ['TROPOMI_LAT_' current_date_str '.mat']), 'lat');
+    save(fullfile(mat_file_path, ['TROPOMI_LON_' current_date_str '.mat']), 'lon');
+    toc
+end
+
