@@ -1,0 +1,67 @@
+addpath /home/cykim/matlab/func/mexcdf/mexnc
+addpath /home/cykim/matlab/func/mexcdf/snctools
+addpath /home/cykim/matlab/func
+addpath /home/cykim/matlab/func/landmask
+addpath /home/cykim/matlab/func/colormap
+addpath /home/cykim/matlab/func/hatch
+
+lon_grid = -180:0.5:180;
+lat_grid = -90:0.5:90;
+[lon_grid, lat_grid] = meshgrid(lon_grid, lat_grid);
+
+avogadro_number = 6.0221e23;
+du_factor = 2.69e16;
+
+file_path = '/data01/satellite/IASI/O3/TCO/';
+
+start_date = datenum('20200101', 'yyyymmdd');
+end_date = datenum('20201231', 'yyyymmdd');
+date_range = start_date:end_date;
+
+tco_grid_2020 = NaN(size(lon_grid, 1), size(lon_grid, 2), numel(date_range));
+
+numWorkers = 24;
+parpool('local', numWorkers);
+
+parfor t = 1:numel(date_range)
+    tic
+    current_date_str = datestr(date_range(t), 'yyyymmdd');
+    
+    file_tco = [file_path 'IASI_METOPB_L2_O3_COLUMN_' current_date_str '_ULB-LATMOS_V6.5.0.nc'];
+    
+    tco = squeeze(nc_varget(file_tco, 'O3_total_column')) .* avogadro_number ./ (1e4 * du_factor);
+    lat = squeeze(nc_varget(file_tco, 'latitude'));
+    lon = squeeze(nc_varget(file_tco, 'longitude'));
+    sza = squeeze(nc_varget(file_tco, 'solar_zenith_angle'));
+
+    index = (sza < 90);
+    tco_filtered = tco(index);
+    lat_filtered = lat(index);
+    lon_filtered = lon(index);
+    
+    max_distance = 0.5;
+    
+    tco_temp = NaN(size(lon_grid));
+    
+    for i = 1:size(lon_grid, 1)
+        for j = 1:size(lon_grid, 2)
+            lon_point = lon_grid(i, j);
+            lat_point = lat_grid(i, j);
+            distance = sqrt((lon_filtered - lon_point).^2 + (lat_filtered - lat_point).^2);
+            pixel_index = find(distance <= max_distance);
+            if ~isempty(pixel_index)
+                tco_temp(i, j) = mean(tco_filtered(pixel_index));
+            end
+        end
+    end
+    
+    tco_grid_2020(:, :, t) = tco_temp;
+    toc
+end
+
+
+delete(gcp('nocreate'));
+
+tco_grid_2020(tco_grid_2020 == 0) = NaN;
+
+save('tco_grid_2020.mat', 'tco_grid_2020');
