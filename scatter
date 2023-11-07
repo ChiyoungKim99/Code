@@ -1,0 +1,19 @@
+load coast_hjkim.mat;
+
+figure('Position',[50 50 1100 600]); h=gca;
+scatter(lon_filtered, lat_filtered, 10, tco_filtered, 'filled');
+hold on;
+plot(lonmap, latmap, 'k', 'LineWidth', 2);
+colormap(jet)
+a = colorbar('YTick', 100:50:600);
+a.Label.String = 'DU';
+a.Label.Rotation = 0;  % Set the rotation angle to 0 degrees for the colorbar label
+a.FontSize = 16;
+caxis([100 600]);
+xlim([-180 180]); ylim([-90 90]);
+h.YTick = -90:15:90; h.YTickLabel = {'90\circS','','60\circS','','30\circS','','0\circ','','30\circN','','60\circN','','90\circN'};
+h.XTick = -180:30:180; h.XTickLabel = {'180\circW','','120\circW','','60\circW','','0\circ','','60\circE','','120\circE','','180\circE'};
+h.XTickLabelRotation = 0; 
+h.FontSize=16; 
+box on; grid on;
+title('20200101 IASI','FontSize',16, 'FontWeight', 'bold');
