@@ -28,10 +28,6 @@ for t = 1:numel(date_range)
         lat = cat(1, lat, lat_1(:));
         lon = cat(1, lon, lon_1(:));
     end
-    
-    save(fullfile(mat_file_path, ['TROPOMI_TCO_' current_date_str '.mat']), 'tco');
-    save(fullfile(mat_file_path, ['TROPOMI_LAT_' current_date_str '.mat']), 'lat');
-    save(fullfile(mat_file_path, ['TROPOMI_LON_' current_date_str '.mat']), 'lon');
+    save(fullfile(mat_file_path, ['TROPOMI_' date_str '.mat']), 'tco', 'lat', 'lon');
     toc
 end
-
