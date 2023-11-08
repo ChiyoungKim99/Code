@@ -10,8 +10,8 @@ date_range = start_date:end_date;
 
 for t = 1:numel(date_range)
     tic
-    current_date_str = datestr(date_range(t), 'yyyymmdd');
-    file_pattern = [file_path 'S5P_RPRO_L2__O3_____' current_date_str '*'];
+    date_str = datestr(date_range(t), 'yyyymmdd');
+    file_pattern = [file_path 'S5P_RPRO_L2__O3_____' date_str '*'];
     tropomi_files = dir(file_pattern);
     
     tco = [];
