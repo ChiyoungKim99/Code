@@ -31,7 +31,7 @@ lon_idx_2 = find(lon>70 & lon<=170);
 lat_idx_2 = find(lat>50 & lat<=60);
 
 lon_idx_3 = find(lon>90 & lon<=160);
-lat_idx_3 = find(lat>5 & lat<=10);
+lat_idx_3 = find(lat>-5 & lat<=10);
 
 
 jet_1 = squeeze(nansum(nansum(u200(lon_idx_1,lat_idx_1,:).*awm(lon_idx_1,lat_idx_1,:),1),2)./nansum(nansum(awm(lon_idx_1,lat_idx_1,:),1),2));
